@@ -247,9 +247,10 @@ pub mod futures {
         fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
             let this = self.project();
             match this.inner.poll(cx) {
-                Poll::Ready(rsp) => Poll::Ready(
-                    rsp.map(|rsp| rsp.try_into().expect("service gave wrong response type")),
-                ),
+                Poll::Ready(rsp) => Poll::Ready(rsp.map(|rsp| {
+                    rsp.try_into()
+                        .expect("consensus service gave wrong response type")
+                })),
                 Poll::Pending => Poll::Pending,
             }
         }
@@ -273,9 +274,10 @@ pub mod futures {
         fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
             let this = self.project();
             match this.inner.poll(cx) {
-                Poll::Ready(rsp) => Poll::Ready(
-                    rsp.map(|rsp| rsp.try_into().expect("service gave wrong response type")),
-                ),
+                Poll::Ready(rsp) => Poll::Ready(rsp.map(|rsp| {
+                    rsp.try_into()
+                        .expect("mempool service gave wrong response type")
+                })),
                 Poll::Pending => Poll::Pending,
             }
         }
@@ -299,9 +301,10 @@ pub mod futures {
         fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
             let this = self.project();
             match this.inner.poll(cx) {
-                Poll::Ready(rsp) => Poll::Ready(
-                    rsp.map(|rsp| rsp.try_into().expect("service gave wrong response type")),
-                ),
+                Poll::Ready(rsp) => Poll::Ready(rsp.map(|rsp| {
+                    rsp.try_into()
+                        .expect("info service gave wrong response type")
+                })),
                 Poll::Pending => Poll::Pending,
             }
         }
@@ -325,9 +328,10 @@ pub mod futures {
         fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
             let this = self.project();
             match this.inner.poll(cx) {
-                Poll::Ready(rsp) => Poll::Ready(
-                    rsp.map(|rsp| rsp.try_into().expect("service gave wrong response type")),
-                ),
+                Poll::Ready(rsp) => Poll::Ready(rsp.map(|rsp| {
+                    rsp.try_into()
+                        .expect("snapshot service gave wrong response type")
+                })),
                 Poll::Pending => Poll::Pending,
             }
         }

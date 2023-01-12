@@ -31,7 +31,9 @@ tracing-subscriber = "0.2"
 doc = []
 
 [patch.crates-io]
-#tendermint = { path = "../tendermint-rs/tendermint" }
-#tendermint-proto = { path = "../tendermint-rs/proto" }
-tendermint = { git = "https://github.com/informalsystems/tendermint-rs.git", branch = "mikhail/multi-tc-version-support" }
-tendermint-proto = { git = "https://github.com/informalsystems/tendermint-rs.git", branch = "mikhail/multi-tc-version-support" }
+tendermint = { path = "../tendermint-rs/tendermint" }
+tendermint-proto = { path = "../tendermint-rs/proto" }
+#tendermint = { git = "https://github.com/informalsystems/tendermint-rs.git", branch = "mikhail/multi-tc-version-support" }
+#tendermint-proto = { git = "https://github.com/informalsystems/tendermint-rs.git", branch = "mikhail/multi-tc-version-support" }
+#tendermint = { git = "https://github.com/aakoshh/tendermint-rs.git", branch = "mikhail/multi-tc-version-support" }
+#tendermint-proto = { git = "https://github.com/aakoshh/tendermint-rs.git", branch = "mikhail/multi-tc-version-support" }
