@@ -12,7 +12,7 @@ use futures::future::FutureExt;
 use structopt::StructOpt;
 use tower::{Service, ServiceBuilder};
 
-use tendermint::abci::{response, Event, EventAttributeIndexExt, Request, Response};
+use tendermint::abci::{request, response, Event, EventAttributeIndexExt, Request, Response};
 
 use tower_abci::{split, BoxError, Server};
 
@@ -42,6 +42,11 @@ impl Service<Request> for KVStore {
             Request::Query(query) => Response::Query(self.query(query.data)),
             Request::DeliverTx(deliver_tx) => Response::DeliverTx(self.deliver_tx(deliver_tx.tx)),
             Request::Commit => Response::Commit(self.commit()),
+            // https://github.com/tendermint/tendermint/blob/v0.37.0-rc2/spec/abci/abci%2B%2B_tmint_expected_behavior.md#adapting-existing-applications-that-use-abci`
+            Request::PrepareProposal(pp) => Response::PrepareProposal(prepare_proposal(pp)),
+            Request::ProcessProposal(_) => {
+                Response::ProcessProposal(response::ProcessProposal::Accept)
+            }
             // unhandled messages
             Request::Flush => Response::Flush,
             Request::Echo(_) => Response::Echo(Default::default()),
@@ -53,16 +58,25 @@ impl Service<Request> for KVStore {
             Request::OfferSnapshot(_) => Response::OfferSnapshot(Default::default()),
             Request::LoadSnapshotChunk(_) => Response::LoadSnapshotChunk(Default::default()),
             Request::ApplySnapshotChunk(_) => Response::ApplySnapshotChunk(Default::default()),
-            // response::SetOption is missing a Default impl as of tm-rs 0.26
-            Request::SetOption(_) => Response::SetOption(response::SetOption {
-                code: tendermint::abci::Code::Ok,
-                log: String::new(),
-                info: String::new(),
-            }),
         };
         tracing::info!(?rsp);
         async move { Ok(rsp) }.boxed()
     }
+}
+
+/// Copy all proposed transactions into the response, respecting the maximum size.
+fn prepare_proposal(pp: request::PrepareProposal) -> response::PrepareProposal {
+    let max_tx_bytes: usize = pp.max_tx_bytes.try_into().unwrap();
+    let mut size: usize = 0;
+    let mut txs = Vec::new();
+    for tx in pp.txs {
+        if size.saturating_add(tx.len()) > max_tx_bytes {
+            break;
+        }
+        size += tx.len();
+        txs.push(tx);
+    }
+    response::PrepareProposal { txs }
 }
 
 impl KVStore {
